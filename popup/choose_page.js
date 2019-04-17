@@ -20,7 +20,7 @@ function htmlDecode(input){
 
 document.addEventListener("click", function(e) {
   if(e.target.className == "button1"){
-    $.post("http://localhost/content_saver/test.php", {"action":"get_cats"}, function(txt){
+    $.post("http://localhost/chrome_content_saver/test.php", {"action":"get_cats"}, function(txt){
       var arTxt = txt.split(',');
       for (let cat of arTxt) {
         document.getElementById("select").innerHTML += '<option value="'+cat+'">'+cat+'</option>';
@@ -49,7 +49,7 @@ document.addEventListener("click", function(e) {
               
               $.ajax({
                       type: 'POST',
-                      url: "http://localhost/content_saver/test.php",
+                      url: "http://localhost/chrome_content_saver/test.php",
                       data: {"action":"validate_key","key_need":key_need},
                       error: function(jqXHR, textStatus) { alert(textStatus); },
                       dataType: 'text',
@@ -65,7 +65,7 @@ document.addEventListener("click", function(e) {
                               }
               });
 
-              /*$.post("http://localhost/content_saver/test.php", {"key_need":key_need}, function(txt){
+              /*$.post("http://localhost/chrome_content_saver/test.php", {"key_need":key_need}, function(txt){
                 if(txt == "No Match key"){
                   alert("Unique");
                   con = false;   // not in work 
@@ -86,7 +86,7 @@ document.addEventListener("click", function(e) {
                 "action":"post_data"
             };  
 
-            $.post("http://localhost/content_saver/test.php", data, function(txt){
+            $.post("http://localhost/chrome_content_saver/test.php", data, function(txt){
               if(key_need == txt){
                 chrome.tabs.query(
                 {currentWindow: true, active: true}, 
