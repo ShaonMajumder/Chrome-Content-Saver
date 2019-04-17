@@ -1,0 +1,31 @@
+{
+
+  "manifest_version": 2,
+  "name": "Content_Saver",
+  "version": "1.0",
+
+  "description": "Adds a red border to all webpages matching mozilla.org.",
+
+  "icons": {
+    "48": "icons/32x32.png"
+  },
+
+  "permissions": [
+    "<all_urls>",
+    "tabs",
+    "clipboardWrite",
+    "notifications",
+    "storage",
+    "tabs"
+  ],
+
+  "browser_action": {
+    "browser_style": true,
+    "default_popup": "popup/choose_page.html",
+    "default_icon": {
+      "16": "icons/16x16.ico",
+      "32": "icons/32x32.ico"
+    }
+  }
+
+}
