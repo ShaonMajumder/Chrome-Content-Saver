@@ -1,0 +1,1 @@
+Converting strings to numbers with vanilla JavaScript | Go Make Things - https://gomakethings.com/converting-strings-to-numbers-with-vanilla-javascript/

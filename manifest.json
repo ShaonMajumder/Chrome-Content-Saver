@@ -1,10 +1,10 @@
 {
 
   "manifest_version": 2,
-  "name": "Content_Saver",
+  "name": "Chrome Content Saver",
   "version": "1.0",
 
-  "description": "Adds a red border to all webpages matching mozilla.org.",
+  "description": "Never Loose your content again",
 
   "icons": {
     "48": "icons/32x32.png"
@@ -23,8 +23,8 @@
     "browser_style": true,
     "default_popup": "popup/choose_page.html",
     "default_icon": {
-      "16": "icons/16x16.ico",
-      "32": "icons/32x32.ico"
+      "16": "icons/16x16.png",
+      "32": "icons/32x32.png"
     }
   }
 

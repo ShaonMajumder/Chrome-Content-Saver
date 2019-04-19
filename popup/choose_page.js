@@ -1,3 +1,41 @@
+var postUrl = "http://localhost/chrome_content_saver/popup/test.php";
+
+function generate_valid_key(){  
+  var con = true;
+  while(con){
+    let r = Math.random().toString(36).substring(7);
+    var key_need = r;
+    $.ajax({
+            type: 'POST',
+            url: postUrl,
+            data: {"action":"validate_key","key_need":key_need},
+            error: function(jqXHR, textStatus) { alert(textStatus); },
+            dataType: 'text',
+            async: false,
+            success: function(txt){
+                      if(txt == "No Match key"){
+                        //alert("Unique");
+                        con = false;    // breaking loop
+                        
+                      }else if(key_need == txt){
+                        //alert("Not Unique");
+                      }
+                    }
+    });
+  }
+  return key_need;
+}
+
+function getScriptURL(){
+  var scripts = document.getElementsByTagName('script');
+  var lastScript = scripts[scripts.length-1];
+  var scriptName = lastScript.src;
+  var scriptUrlArray = scriptName.split('/');
+  var scriptUrlArray = scriptUrlArray.splice(0,scriptUrlArray.length-1);
+  var scriptUrl = scriptUrlArray.join('/');
+  // alternatie var script =  document.currentScript || document.querySelector('script[src*="choose_page.js"]'); return script.src;
+  return scriptUrl;
+}
 
 function download(filename, text) {
   var element = document.createElement('a');
@@ -18,9 +56,28 @@ function htmlDecode(input){
   return e.childNodes.length === 0 ? "" : e.childNodes[0].nodeValue;
 }
 
+function getCurrentTabUrls(){
+  var urls=Array();
+  chrome.tabs.query(
+    {/*currentWindow: true, active: true*/}, 
+      function(tabs){
+        for (let tab of tabs) {
+            var title_ = tab.title;
+            var url_ = tab.url;
+            urls.push(url_);
+            
+        }
+        var url_file_text = htmlDecode( urls.join('<br>').replace(/\<br>/g,'\r\n') );
+        download("urls.txt",url_file_text);
+      }
+  );
+  
+}
+
 document.addEventListener("click", function(e) {
-  if(e.target.className == "button1"){
-    $.post("http://localhost/chrome_content_saver/test.php", {"action":"get_cats"}, function(txt){
+  //page 1
+  if(e.target.id == "submit_to_category"){
+    $.post(postUrl, {"action":"get_cats"}, function(txt){
       var arTxt = txt.split(',');
       for (let cat of arTxt) {
         document.getElementById("select").innerHTML += '<option value="'+cat+'">'+cat+'</option>';
@@ -29,6 +86,90 @@ document.addEventListener("click", function(e) {
     document.getElementById("initial").style="display:none;";
     document.getElementById("form1").style="display:block;";
   }
+
+  else if(e.target.id == "restore_last_session"){
+    $.ajax({
+      type: 'POST',
+      url: postUrl,
+      data: {"action":"restore_last_session"},
+      error: function(jqXHR, textStatus) { alert(textStatus); },
+      dataType: 'text',
+      async: false,
+      success: function(txt){
+        var urls = JSON.parse(txt);
+        for(let url of urls)
+        chrome.tabs.create({url: url});
+      }
+    });
+    
+  }else if(e.target.id == "populate_tabs"){
+    var urls = Array();
+    chrome.tabs.query(
+      {/*currentWindow: true, active: true*/}, 
+      function(tabs){
+        var urls = Array();
+        document.getElementById("initial").style="display:none;";
+
+        var tab_div = document.createElement("div");
+        tab_div.setAttribute("id", "populated_tab_div");
+        document.body.appendChild(tab_div);
+
+        for(let tab of tabs){
+          urls.push(tab.url);
+          document.getElementById("populated_tab_div").innerHTML += "<span id='"+tab.id+"' class='populated_tab'>" + tab.title + "</span><br>";
+        }
+      }
+    );
+
+  }else if(e.target.className == "populated_tab"){
+    var target_id = parseInt(e.target.id);
+    chrome.tabs.update(target_id, {selected: true});
+  }else if(e.target.id == "save_this_session"){
+    chrome.tabs.query(
+    {/*currentWindow: true, active: true*/}, 
+      function(tabs){
+        var urls = Array();
+        for(let tab of tabs){
+          urls.push(tab.url);
+        }
+        
+        var r = generate_valid_key();
+        $.ajax({
+          type: 'POST',
+          url: postUrl,
+          data: {"action":"save_this_session","urls":urls.join(','),"postkey":r},
+          error: function(jqXHR, textStatus) { alert(textStatus); },
+          dataType: 'text',
+          async: false,
+          success: function(txt){
+                if(txt == r){
+                  document.body.innerHTML = "Saved your tabs !!!";
+                  setTimeout(function(){ window.close(); }, 1500);
+                  chrome.tabs.query(
+                  {/*currentWindow: true, active: true*/}, 
+                    function(tabs){
+                      for(let tab of tabs){
+                        chrome.tabs.remove(tab.id);
+                        //last tab remains when it closes so it can add up this tab when restored
+                      }
+                    }
+                  );
+                }else{
+                  alert("All this tabs are already saved !!!");
+                }
+          }
+        });
+      }
+    );
+  }
+  else if(e.target.id == "export_opened_tab_urls"){
+     //var TagName_ = window.prompt("Enter a file URL","TagName");
+    getCurrentTabUrls();
+    
+  }
+  //page 1
+
+  //category page
   if(e.target.className == "submit"){
     chrome.tabs.query(
     {currentWindow: true, active: true}, 
@@ -49,7 +190,7 @@ document.addEventListener("click", function(e) {
               
               $.ajax({
                       type: 'POST',
-                      url: "http://localhost/chrome_content_saver/test.php",
+                      url: postUrl,
                       data: {"action":"validate_key","key_need":key_need},
                       error: function(jqXHR, textStatus) { alert(textStatus); },
                       dataType: 'text',
@@ -65,7 +206,7 @@ document.addEventListener("click", function(e) {
                               }
               });
 
-              /*$.post("http://localhost/chrome_content_saver/test.php", {"key_need":key_need}, function(txt){
+              /*$.post(postUrl, {"key_need":key_need}, function(txt){
                 if(txt == "No Match key"){
                   alert("Unique");
                   con = false;   // not in work 
@@ -86,7 +227,7 @@ document.addEventListener("click", function(e) {
                 "action":"post_data"
             };  
 
-            $.post("http://localhost/chrome_content_saver/test.php", data, function(txt){
+            $.post(postUrl, data, function(txt){
               if(key_need == txt){
                 chrome.tabs.query(
                 {currentWindow: true, active: true}, 
@@ -108,28 +249,9 @@ document.addEventListener("click", function(e) {
 
     
   }
-   
+  //category page
 
-  if(e.target.className == "button2"){
-     var TagName_ = window.prompt("Enter a file URL","TagName");
-
-    chrome.tabs.query(
-    {/*currentWindow: true, active: true*/}, 
-      function(tabs){
-        document.getElementById('list').innerHTML = "";
-        for (let tab of tabs) {
-            var title_ = tab.title;
-            var url_ = tab.url;
-            
-            document.getElementById('list').innerHTML += title_ + " <+>-u-r-l-<+> " + url_ + "<br>";
-          }
-        var url_file_text = htmlDecode( document.getElementById("list").innerHTML.replace(/\<br>/g,'\r\n') );
-        download("urls.txt",url_file_text);
-      }
-    );
-
-    
-  }
+  
   /*
   if (!e.target.classList.contains("page-choice")) {
     return
