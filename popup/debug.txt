@@ -1,1 +1,1 @@
-Converting strings to numbers with vanilla JavaScript | Go Make Things - https://gomakethings.com/converting-strings-to-numbers-with-vanilla-javascript/
+CSS Web Safe Fonts - https://www.w3schools.com/cssref/css_websafe_fonts.asp

@@ -6,21 +6,21 @@ function generate_valid_key(){
     let r = Math.random().toString(36).substring(7);
     var key_need = r;
     $.ajax({
-            type: 'POST',
-            url: postUrl,
-            data: {"action":"validate_key","key_need":key_need},
-            error: function(jqXHR, textStatus) { alert(textStatus); },
-            dataType: 'text',
-            async: false,
-            success: function(txt){
-                      if(txt == "No Match key"){
-                        //alert("Unique");
-                        con = false;    // breaking loop
-                        
-                      }else if(key_need == txt){
-                        //alert("Not Unique");
-                      }
-                    }
+      type: 'POST',
+      url: postUrl,
+      data: {"action":"validate_key","key_need":key_need},
+      error: function(jqXHR, textStatus) { alert(textStatus); },
+      dataType: 'text',
+      async: false,
+      success: function(txt){
+        if(txt == "No Match key"){
+          //alert("Unique");
+          con = false;    // breaking loop
+          
+        }else if(key_need == txt){
+          //alert("Not Unique");
+        }
+      }
     });
   }
   return key_need;
