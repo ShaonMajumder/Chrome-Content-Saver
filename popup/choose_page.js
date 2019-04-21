@@ -130,16 +130,14 @@ document.addEventListener("click", function(e) {
     document.getElementById("initial").style="display:none;";
     document.getElementById("form1").style="display:block;";
     populate_categories();
-  }
-  else if(e.target.id == "new_input_cat_submit"){    
+  }else if(e.target.id == "new_input_cat_submit"){    
     var inText = document.getElementById("new_input_cat");
-    document.getElementById("select").innerHTML += '<option value="'+inText.value+'">'+inText.value+'</option>';
-    document.getElementById("select").innerHTML += '<option value="NEW">NEW</option>';
-
-    var elem = document.getElementById("input_cat_div");
-    elem.parentNode.removeChild(elem);
-  }
-  else if(e.target.id == "restore_last_session"){
+    $.post(postUrl, {"action":"input_category","new_category":inText.value}, function(txt){
+      populate_categories();
+      var elem = document.getElementById("input_cat_div");
+      elem.parentNode.removeChild(elem);
+    });
+  }else if(e.target.id == "restore_last_session"){
     $.ajax({
       type: 'POST',
       url: postUrl,
@@ -153,7 +151,6 @@ document.addEventListener("click", function(e) {
         chrome.tabs.create({url: url});
       }
     });
-    
   }else if(e.target.id == "populate_tabs"){
     var urls = Array();
     chrome.tabs.query(
@@ -213,8 +210,7 @@ document.addEventListener("click", function(e) {
         });
       }
     );
-  }
-  else if(e.target.id == "export_opened_tab_urls"){
+  }else if(e.target.id == "export_opened_tab_urls"){
     //var TagName_ = window.prompt("Enter a file URL","TagName");
     getCurrentTabUrls();
   }

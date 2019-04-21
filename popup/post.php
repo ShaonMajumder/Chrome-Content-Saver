@@ -15,7 +15,15 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-if($_POST['action']=='save_this_session'){
+
+if($_POST['action']=='input_category'){
+	$sql = "SELECT * FROM `constants` WHERE `name` = 'Resource_Categories'";
+	$row = $conn->query($sql)->fetch_assoc();
+	$update_cat = $row['value'].','.$_POST['new_category'];
+	$sql = "UPDATE `constants` SET `value` = '".$update_cat."' WHERE `name` = 'Resource_Categories'";
+	$conn->query($sql);
+
+}else if($_POST['action']=='save_this_session'){
 	$urls = explode(",", $_POST['urls']);
 	$postkey = $_POST['postkey'];
 	foreach($urls as $url){
