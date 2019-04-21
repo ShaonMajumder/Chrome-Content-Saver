@@ -1,7 +1,8 @@
 <?php
+$postUrl = "http://localhost/chrome_content_saver/popup/post.php";
+
 date_default_timezone_set("Asia/Dhaka");
 $date_now = date("Y-m-d");
-
 
 $ini_array = parse_ini_file("config.ini");
 $servername = $ini_array["servername"];
@@ -102,7 +103,7 @@ if($_GET){
 		    var solution = document.getElementsByName("solution")[0].value;
 		    var note = document.getElementsByName("note")[0].value;
 		    var postkey = document.getElementsByName("postkey")[0].value;
-		    $.post( "http://localhost/chrome_content_saver/popup/post.php",
+		    $.post( "<?php echo $postUrl; ?>",
 		    	{"action":action,"title":title,"url":url,"select":select,"question":question,"solution":solution,"note":note,"postkey":postkey},
 		    	function(txt){
 		    		if(txt = postkey){
