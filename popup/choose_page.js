@@ -130,14 +130,17 @@ document.addEventListener("click", function(e) {
     document.getElementById("initial").style="display:none;";
     document.getElementById("form1").style="display:block;";
     populate_categories();
-  }else if(e.target.id == "new_input_cat_submit"){    
+  }
+  else if(e.target.id == "new_input_cat_submit"){    
     var inText = document.getElementById("new_input_cat");
     $.post(postUrl, {"action":"input_category","new_category":inText.value}, function(txt){
       populate_categories();
-      var elem = document.getElementById("input_cat_div");
-      elem.parentNode.removeChild(elem);
     });
-  }else if(e.target.id == "restore_last_session"){
+    
+    var elem = document.getElementById("input_cat_div");
+    elem.parentNode.removeChild(elem);
+  }
+  else if(e.target.id == "restore_last_session"){
     $.ajax({
       type: 'POST',
       url: postUrl,
@@ -151,6 +154,7 @@ document.addEventListener("click", function(e) {
         chrome.tabs.create({url: url});
       }
     });
+    
   }else if(e.target.id == "populate_tabs"){
     var urls = Array();
     chrome.tabs.query(
@@ -210,7 +214,8 @@ document.addEventListener("click", function(e) {
         });
       }
     );
-  }else if(e.target.id == "export_opened_tab_urls"){
+  }
+  else if(e.target.id == "export_opened_tab_urls"){
     //var TagName_ = window.prompt("Enter a file URL","TagName");
     getCurrentTabUrls();
   }
@@ -224,20 +229,22 @@ document.addEventListener("click", function(e) {
             var title1 = tabs[0].title;
             var url1 = tabs[0].url;
             //var TagName_ = window.prompt("Enter a file URL","TagName");
-            var TagName_ = $("#select :selected").val();
-            var solution_ = escape($("#solution").val());
+            var sle = document.getElementById("select");
+            var TagName_ = sle.options[sle.selectedIndex].value;
+            var solution_ = escape(document.getElementById("solution").value);
+            var post_key_now = generate_valid_key();
             //use unescape() to read after getting data from database
             var data = {
                 "title": title1,
                 "url": url1,
                 "tag": TagName_,
-                "postkey": generate_valid_key(),
+                "postkey": post_key_now,
                 "solution":solution_,
                 "action":"post_data"
             };  
 
             $.post(postUrl, data, function(txt){
-              if(key_need == txt){
+              if(post_key_now == txt){
                 chrome.tabs.query(
                 {currentWindow: true, active: true}, 
                   function(tabs){
@@ -248,9 +255,6 @@ document.addEventListener("click", function(e) {
             });
             document.body.innerHTML = "Successfully Done !!!";
             setTimeout(function(){ window.close(); }, 1500);
-
-              
-              
             
 
       }

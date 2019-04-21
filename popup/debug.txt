@@ -1,1 +1,1 @@
-Extensions - chrome://extensions/
+Select: data - Adminer - http://localhost/adminer-4.7.1-mysql.php?username=root&db=fitness-project&select=data
