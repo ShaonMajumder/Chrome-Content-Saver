@@ -1,3 +1,4 @@
+//how to save note,question and solution separately as popup window goes when you get to copy other element
 var postUrl = "http://localhost/chrome_content_saver/popup/post.php";
 
 function random_string(num_s){
@@ -124,6 +125,7 @@ function populate_categories(){
   });
 }
 
+
 document.addEventListener("click", function(e) {
   //page 1
   if(e.target.id == "submit_to_category"){
@@ -222,7 +224,25 @@ document.addEventListener("click", function(e) {
   //page 1
 
   //category page
-  if(e.target.className == "submit"){
+  if(e.target.className == "details"){
+    var sle = document.getElementById("select");
+    var category = sle.options[sle.selectedIndex].value;
+    var solution = document.getElementById("solution").value;
+    var question = document.getElementById("question").value;
+    var note = document.getElementById("note").value;
+    var url = window.location.href;
+    
+    chrome.tabs.query(
+      {currentWindow: true, active: true},
+      function(tabs){
+        var title = tabs[0].title;
+        var newURL = postUrl+'?title='+title+'&cat='+category+'&sol='+solution+'&ques='+question+'&note='+note+'&url='+url;
+        chrome.tabs.create({ url: newURL });    
+      }
+    );
+    
+  }
+  else if(e.target.className == "submit"){
     chrome.tabs.query(
     {currentWindow: true, active: true}, 
       function(tabs){
@@ -232,6 +252,8 @@ document.addEventListener("click", function(e) {
             var sle = document.getElementById("select");
             var TagName_ = sle.options[sle.selectedIndex].value;
             var solution_ = escape(document.getElementById("solution").value);
+            var note_ = document.getElementById("note").value;
+            var question_ = document.getElementById("question").value;
             var post_key_now = generate_valid_key();
             //use unescape() to read after getting data from database
             var data = {
@@ -240,6 +262,8 @@ document.addEventListener("click", function(e) {
                 "tag": TagName_,
                 "postkey": post_key_now,
                 "solution":solution_,
+                "note":note_,
+                "question":question_,
                 "action":"post_data"
             };  
 

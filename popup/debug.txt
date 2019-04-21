@@ -1,1 +1,1 @@
-Select: data - Adminer - http://localhost/adminer-4.7.1-mysql.php?username=root&db=fitness-project&select=data
+JavaScript Window Location - https://www.w3schools.com/js/js_window_location.asp
