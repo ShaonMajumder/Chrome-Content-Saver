@@ -92,34 +92,26 @@ function remove_select_option_by_value(id,value){
 
 
 function populate_categories(){
-  if(!document.getElementById("select")){
-    var select_div = document.createElement("select");
-    select_div.setAttribute("id", "select");
-    select_div.onchange = function () {
-      if (this[this.selectedIndex].value === "NEW") {      
-        remove_select_option_by_value("select","NEW");
-
-        var input_div = document.createElement("div");
-        input_div.setAttribute("id", "input_cat_div");
-        document.body.appendChild(input_div);
-        input_div.innerHTML += '<input type="text" id="new_input_cat" placeholder="New Category"><input id="new_input_cat_submit" type="submit">';
-      }
-    };
-
-    document.getElementById("form1").insertBefore(select_div, document.getElementById("form1").firstChild);
-  }else{
-    var select_div = document.getElementById("select");
-    select_div.onchange = function () {
-      if (this[this.selectedIndex].value === "NEW") {      
-        remove_select_option_by_value("select","NEW");
-
-        var input_div = document.createElement("div");
-        input_div.setAttribute("id", "input_cat_div");
-        document.body.appendChild(input_div);
-        input_div.innerHTML += '<input type="text" id="new_input_cat" placeholder="New Category"><input id="new_input_cat_submit" type="submit">';
-      }
-    };
+  if(document.getElementById("select")){
+    var elem = document.getElementById("select");
+    elem.parentNode.removeChild(elem);
   }
+  
+  var select_div = document.createElement("select");
+  select_div.setAttribute("id", "select");
+  select_div.onchange = function () {
+    if (this[this.selectedIndex].value === "NEW") {      
+      remove_select_option_by_value("select","NEW");
+
+      var input_div = document.createElement("div");
+      input_div.setAttribute("id", "input_cat_div");
+      document.body.appendChild(input_div);
+      input_div.innerHTML += '<input type="text" id="new_input_cat" placeholder="New Category"><input id="new_input_cat_submit" type="submit">';
+    }
+  };
+  var container_div = document.getElementById("form1");
+  container_div.insertBefore(select_div, container_div.firstChild);
+
 
   $.post(postUrl, {"action":"get_cats"}, function(txt){
     if(select_div){
@@ -129,7 +121,6 @@ function populate_categories(){
       }
       select_div.innerHTML += '<option value="NEW">NEW</option>';  
     }
-    
   });
 }
 
