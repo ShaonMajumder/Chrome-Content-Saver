@@ -363,7 +363,7 @@ if($_GET){
 			}
 
 		}else{
-			$sql = "INSERT INTO `data` (`title`, `resource_url`, `category`,`solution`,`postkey`,`question`,`note`,`read_count`) VALUES ('".$title."', '".$url."','".$category."','".$solution."','".$post_key."','".$question."','".$note."','".$read_count."')";
+			$sql = "INSERT INTO `data` (`title`, `resource_url`, `category`,`solution`,`postkey`,`question`,`note`,`read_count`) VALUES ('".$title."', '".$url."','".$category."','".$solution."','".$post_key."','".$question."','".$note."','1')";
 			$conn->query($sql);
 
 			$sql = "SELECT * FROM `data` WHERE `postkey` = '".$post_key."'";

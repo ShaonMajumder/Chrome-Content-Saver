@@ -214,11 +214,11 @@ document.addEventListener("click", function(e) {
           urls.push(tab.url);
         }
         
-        
+        var r = generate_valid_key();
         $.ajax({
           type: 'POST',
           url: postUrl,
-          data: {"action":"save_this_session","urls":urls.join(','),"postkey":generate_valid_key()},
+          data: {"action":"save_this_session","urls":urls.join(','),"postkey":r},
           error: function(jqXHR, textStatus) { alert(textStatus); },
           dataType: 'text',
           async: false,
