@@ -132,8 +132,34 @@ document.addEventListener("click", function(e) {
     document.getElementById("initial").style="display:none;";
     document.getElementById("form1").style="display:block;";
     populate_categories();
-  }
-  else if(e.target.id == "new_input_cat_submit"){    
+  }else if(e.target.id == "open_one_from_last_session"){
+    $.post(postUrl, {"action":"open_one_from_last_session"}, function(txt){
+      var json = JSON.parse(txt);
+      var url = json[0];
+      var repeat = json[1];
+      var postkey = json[2];
+      if(repeat == 'norepeat'){
+        $.post(postUrl, {"action":"read_once","url":url,"postkey":postkey},function(txt){
+          if(txt == 'read-once'){
+            chrome.tabs.create({url: url/*,"selected":false*/},function(tab){
+              //alert(tab.id);
+            });
+          }
+        })
+      }else if(repeat == 'repeat'){
+        var confirmation = confirm("Want to watch again?");
+        if(confirmation){
+          $.post(postUrl, {"action":"read_again","url":url,"postkey":postkey},function(txt){
+            if(txt == 'read-again'){
+              chrome.tabs.create({url: url});
+            }
+          })
+        }else{
+
+        }
+      }
+    })
+  }else if(e.target.id == "new_input_cat_submit"){    
     var inText = document.getElementById("new_input_cat");
     $.post(postUrl, {"action":"input_category","new_category":inText.value}, function(txt){
       populate_categories();

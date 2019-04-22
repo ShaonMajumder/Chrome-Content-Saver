@@ -1,4 +1,5 @@
 <?php
+require('Squery.php');
 $postUrl = "http://localhost/chrome_content_saver/popup/post.php";
 
 date_default_timezone_set("Asia/Dhaka");
@@ -16,6 +17,8 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
+
+$MySquery = new MyQueries($conn);
 
 function generate_random_string($num){
 	$permitted_chars = '0123456789abcdefghijklmnopqrstuvwxyz';
@@ -46,6 +49,11 @@ function generate_valid_key(){
 	return $post_key;
 }
 
+function duplicate_values($key){
+	$sql = "SELECT * FROM `data` GROUP BY `{$key}` HAVING COUNT(`{$key}`) > 1";
+	$result = $conn->query($sql);
+	return $result;
+}
 
 
 if($_GET){
@@ -130,7 +138,85 @@ if($_GET){
 		    $sql = "INSERT INTO `post_keys` (`postkey`) VALUES ('".$_POST["key_need"]."')";
 			$conn->query($sql);
 		}
+	}else if($_POST['action']=='check_if_categorized'){
+		$sql = "SELECT * FROM `data`";
+	}else if($_POST['action']=='read_again'){
+		$url = $_POST["url"];
+		$postkey = $_POST["postkey"];
+		$sql = "SELECT `read_count` FROM `data` WHERE `resource_url` = '{$url}'";
+		$row = $conn->query($sql)->fetch_assoc();
+		$read_count = $row["read_count"] + 1;
+		$sql = "UPDATE `data` SET `read_count` = '{$read_count}', `postkey` = '{$postkey}' WHERE `resource_url` = '{$url}'";
+		$conn->query($sql);
+
+
+		//if read
+		$sql = "SELECT * FROM `browsing` WHERE `url`='{$url}' ORDER BY id DESC LIMIT 1";
+		$row = $conn->query($sql)->fetch_assoc();
+		$postkey = $row['postkey'];
+		$id = $row['id'];
+
+		$sql = "SELECT COUNT(`postkey`) FROM `browsing` WHERE `postkey` = '{$postkey}'";
+		$row = $conn->query($sql)->fetch_assoc();
+		$post_count = $row["COUNT(`postkey`)"];
+		
+		if($post_count == 1){//check others are not sharing the same postkey
+			/* Not deleting as it is used in new entry of `data` table
+			$sql = "DELETE FROM `post_keys` WHERE `postkey` = '{$postkey}'";
+			$conn->query($sql);
+			*/
+		}
+		
+		$sql = "DELETE FROM `browsing` WHERE `id` = '{$id}'";
+		$conn->query($sql);
+
+		echo "read-again";
+
+	}else if($_POST['action']=='read_once'){
+		$url = $_POST["url"];
+		$postkey = $_POST["postkey"];
+		$sql = "INSERT INTO `data` (`resource_url`,`read_count`,`postkey`) VALUES ('{$url}','0','{$postkey}')";
+		$conn->query($sql);
+
+		//if read
+		$sql = "SELECT * FROM `browsing` WHERE `url`='{$url}' ORDER BY id DESC LIMIT 1";
+		$row = $conn->query($sql)->fetch_assoc();
+		$postkey = $row['postkey'];
+		$id = $row['id'];
+
+		$sql = "SELECT COUNT(`postkey`) FROM `browsing` WHERE `postkey` = '{$postkey}'";
+		$row = $conn->query($sql)->fetch_assoc();
+		$post_count = $row["COUNT(`postkey`)"];
+		
+		if($post_count == 1){//check others are not sharing the same postkey
+			/* Not deleting as it is used in new entry of `data` table
+			$sql = "DELETE FROM `post_keys` WHERE `postkey` = '{$postkey}'";
+			$conn->query($sql);
+			*/
+		}
+		
+		$sql = "DELETE FROM `browsing` WHERE `id` = '{$id}'";
+		$conn->query($sql);
+
+		echo "read-once";
+	}else if($_POST['action']=='open_one_from_last_session'){
+		$sql = "SELECT * FROM `browsing` ORDER BY id DESC LIMIT 1";
+		$row = $conn->query($sql)->fetch_assoc();
+		$url = $row['url'];
+		$postkey = $row['postkey'];
+		//$url = 'https://www.sitepoint.com/community/t/display-element-when-specific-option-is-selected/226616/7';
+		$sql = "SELECT `read_count` FROM `data` WHERE `resource_url` = '{$url}'";
+		$row = $conn->query($sql)->fetch_assoc();
+		$read_count = $row["read_count"];
+		if($read_count>0){
+			$arr = [$url,'repeat',$postkey];
+		}else{
+			$arr = [$url,'norepeat',$postkey];
+		}
+		echo json_encode($arr);
 	}else if($_POST['action']=='details_form'){
+		# do not create extra postkey , use from previous post
+		// prohibit or watch again and read_count
 		$category = $_POST["select"];
 		$solution = $_POST["solution"];
 		$question = $_POST["question"];
@@ -139,20 +225,48 @@ if($_GET){
 		$title = $_POST["title"];
 		$post_key = $_POST["postkey"];
 		
-		$sql = "INSERT INTO `data` (`title`, `resource_url`, `category`,`solution`,`postkey`,`question`,`note`)
-		VALUES ('".$title."', '".$url."','".$category."','".$solution."','".$post_key."','".$question."','".$note."')";
-		$conn->query($sql);
-
-		$sql = "SELECT * FROM `data` WHERE `postkey` = '".$post_key."'";
+		$sql = "SELECT * FROM `data` where `read_count`='0' and `resource_url`='{$url}'";
 		$result = $conn->query($sql);
 		if ($result->num_rows > 0) {
-		    // output data of each row
-		    while($row = $result->fetch_assoc()) {
-		        echo $row["postkey"];
-		    }
+		    #delete $post_key from post_keys
+		    //$sql = "DELETE FROM `post_keys` WHERE `postkey` = '{$post_key}'";
+		    $row = $result->fetch_assoc();
+		    $postkey = $row["postkey"];
+
+		    $sql = "UPDATE `data` SET `title`='{$title}', `category`='{$category}',`solution`='{$solution}',`postkey`='{$postkey}',`question`='{$question}',`note`='{$note}',`read_count`='{$read_count}' WHERE `resource_url`='{$url}'";
+			$conn->query($sql);
+
+			$sql = "SELECT * FROM `data` WHERE `postkey` = '".$post_key."'";
+			$result = $conn->query($sql);
+			if ($result->num_rows > 0) {
+			    // output data of each row
+			    while($row = $result->fetch_assoc()) {
+			        echo $row["postkey"];
+			    }
+			} else {
+			    echo "0 results";
+			}
+
 		} else {
-		    echo "0 results";
+		    //echo "0 results";
+		    $sql = "INSERT INTO `data` (`title`, `resource_url`, `category`,`solution`,`postkey`,`question`,`note`,`read_count`) VALUES ('".$title."', '".$url."','".$category."','".$solution."','".$post_key."','".$question."','".$note."','1')";
+			$conn->query($sql);
+
+			$sql = "SELECT * FROM `data` WHERE `postkey` = '".$post_key."'";
+			$result = $conn->query($sql);
+			if ($result->num_rows > 0) {
+			    // output data of each row
+			    while($row = $result->fetch_assoc()) {
+			        echo $row["postkey"];
+			    }
+			} else {
+			    echo "0 results";
+			}
 		}
+
+
+
+		
 
 
 	}else if($_POST['action']=='get_cats'){
@@ -216,6 +330,8 @@ if($_GET){
 		echo json_encode($arr);
 	}
 	else if($_POST['action']=='post_data'){
+		# do not create extra postkey , use from previous post
+		// prohibit or watch again and read_count
 		$category = $_POST["tag"];
 		$url =  $_POST["url"];
 		$title = $_POST["title"];
@@ -224,22 +340,45 @@ if($_GET){
 		$note = $_POST['note'];
 		$question = $_POST['question'];
 
-		file_put_contents("debug.txt", $title . " - " . $url);
-
-		$sql = "INSERT INTO `data` (`title`, `resource_url`, `category`,`solution`,`postkey`,`question`,`note`)
-		VALUES ('".$title."', '".$url."','".$category."','".$solution."','".$post_key."','".$question."','".$note."')";
-		$conn->query($sql);
-
-		$sql = "SELECT * FROM `data` WHERE `postkey` = '".$post_key."'";
+		$sql = "SELECT * FROM `data` where `read_count`='0' and `resource_url`='{$url}'";
 		$result = $conn->query($sql);
 		if ($result->num_rows > 0) {
-		    // output data of each row
-		    while($row = $result->fetch_assoc()) {
-		        echo $row["postkey"];
-		    }
-		} else {
-		    echo "0 results";
-		}	
+			#delete $post_key from postkeys
+			//$sql = "DELETE FROM `post_keys` WHERE `postkey` = '{$post_key}'";
+			$row = $result->fetch_assoc();
+		    $postkey = $row["postkey"];
+
+		    $sql = "UPDATE `data` SET `title`='{$title}', `category`='{$category}',`solution`='{$solution}',`postkey`='{$postkey}',`question`='{$question}',`note`='{$note}',`read_count`='{$read_count}' WHERE `resource_url`='{$url}'";
+			$conn->query($sql);
+
+			$sql = "SELECT * FROM `data` WHERE `postkey` = '".$post_key."'";
+			$result = $conn->query($sql);
+			if ($result->num_rows > 0) {
+			    // output data of each row
+			    while($row = $result->fetch_assoc()) {
+			        echo $row["postkey"];
+			    }
+			} else {
+			    echo "0 results";
+			}
+
+		}else{
+			$sql = "INSERT INTO `data` (`title`, `resource_url`, `category`,`solution`,`postkey`,`question`,`note`,`read_count`) VALUES ('".$title."', '".$url."','".$category."','".$solution."','".$post_key."','".$question."','".$note."','".$read_count."')";
+			$conn->query($sql);
+
+			$sql = "SELECT * FROM `data` WHERE `postkey` = '".$post_key."'";
+			$result = $conn->query($sql);
+			if ($result->num_rows > 0) {
+			    // output data of each row
+			    while($row = $result->fetch_assoc()) {
+			        echo $row["postkey"];
+			    }
+			} else {
+			    echo "0 results";
+			}
+		}
+
+		
 	}
 
 
