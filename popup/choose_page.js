@@ -283,7 +283,7 @@ document.addEventListener("click", function(e) {
         var title = tabs[0].title;
         var url = tabs[0].url;
         var newURL = postUrl+'?title='+title+'&cat='+category+'&sol='+solution+'&ques='+question+'&note='+note+'&url='+url;
-        chrome.tabs.create({ url: newURL });    
+        chrome.tabs.create({ url: newURL });
       }
     );
     

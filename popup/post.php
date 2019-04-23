@@ -1,5 +1,7 @@
 <?php
 require('Squery.php');
+
+
 $postUrl = "http://localhost/chrome_content_saver/popup/post.php";
 
 date_default_timezone_set("Asia/Dhaka");
@@ -111,6 +113,8 @@ if($_GET){
 		    var solution = document.getElementsByName("solution")[0].value;
 		    var note = document.getElementsByName("note")[0].value;
 		    var postkey = document.getElementsByName("postkey")[0].value;
+		    //alert(postkey);
+		    
 		    $.post( "<?php echo $postUrl; ?>",
 		    	{"action":action,"title":title,"url":url,"select":select,"question":question,"solution":solution,"note":note,"postkey":postkey},
 		    	function(txt){
@@ -119,6 +123,7 @@ if($_GET){
 		    		}
 		    	}
 		    );
+
 		  }
 		});
 	</script>
@@ -249,8 +254,8 @@ if($_GET){
 
 		} else {
 		    //echo "0 results";
-		    $sql = "INSERT INTO `data` (`title`, `resource_url`, `category`,`solution`,`postkey`,`question`,`note`,`read_count`) VALUES ('".$title."', '".$url."','".$category."','".$solution."','".$post_key."','".$question."','".$note."','1')";
-			$conn->query($sql);
+		    $MySquery->insert('data', array('title', 'resource_url', 'category','solution','postkey','question','note','read_count'), array($title,$url,$category,$solution,$post_key,$question,$note,'1'));
+
 
 			$sql = "SELECT * FROM `data` WHERE `postkey` = '".$post_key."'";
 			$result = $conn->query($sql);

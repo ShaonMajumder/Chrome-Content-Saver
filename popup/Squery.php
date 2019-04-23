@@ -16,8 +16,17 @@ class MyQueries {
 	function __construct(mysqli $conn) {
 		$this->conn = $conn;
 	}
-
+	function test_escape($conn,$arr){
+		$result = array();
+		foreach ($arr as $value) {
+			array_push($result , mysqli_real_escape_string($conn,$value));
+		}	
+		return $result;
+	}
 	function insert($database,$insert_fields,$insert_values){
+		$insert_fields = $this->test_escape($this->conn,$insert_fields);
+		$insert_values = $this->test_escape($this->conn,$insert_values);
+
 		$fields = '(`'.implode("`,`", $insert_fields)."`)";
 		$values = "('".implode("','", $insert_values)."')";
 		$sql = "INSERT INTO `{$database}` {$fields} VALUES {$values}";
