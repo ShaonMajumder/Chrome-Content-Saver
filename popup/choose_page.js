@@ -275,12 +275,13 @@ document.addEventListener("click", function(e) {
     var solution = document.getElementById("solution").value;
     var question = document.getElementById("question").value;
     var note = document.getElementById("note").value;
-    var url = window.location.href;
     
+
     chrome.tabs.query(
       {currentWindow: true, active: true},
       function(tabs){
         var title = tabs[0].title;
+        var url = tabs[0].url;
         var newURL = postUrl+'?title='+title+'&cat='+category+'&sol='+solution+'&ques='+question+'&note='+note+'&url='+url;
         chrome.tabs.create({ url: newURL });    
       }
