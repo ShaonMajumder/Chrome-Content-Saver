@@ -314,8 +314,7 @@ if($_GET){
 		    echo "No Match key";
 		}
 
-	}
-	else if($_POST['action']=='restore_last_session'){
+	}else if($_POST['action']=='restore_last_session'){
 		$arr = array();
 		$sql = "SELECT * FROM `browsing` WHERE `date`='".$date_now."'";
 		$result = $conn->query($sql);
@@ -328,8 +327,32 @@ if($_GET){
 		    
 		}
 		echo json_encode($arr);
-	}
-	else if($_POST['action']=='post_data'){
+	}else if($_POST['action']=='watch_later'){
+		#if url exists then generated post key from generate_valide_key in js remains unused: fix this
+		$url =  $_POST["url"];
+		$title = $_POST["title"];
+		$postkey = $_POST['postkey'];
+
+		$sql = "SELECT * FROM `watch_later` where `url`='{$url}'";
+		$result = $conn->query($sql);
+		if ($result->num_rows > 0) {
+			echo "exists";
+		}else{
+			$sql = "INSERT INTO `watch_later` (`title`, `url`,`postkey`) VALUES ('{$title}','{$url}','{$postkey}')";
+			$conn->query($sql);
+
+			$sql = "SELECT * FROM `watch_later` WHERE `postkey` = '{$postkey}'";
+			$result = $conn->query($sql);
+			if ($result->num_rows > 0) {
+			    // output data of each row
+			    while($row = $result->fetch_assoc()) {
+			        echo $row["postkey"];
+			    }
+			} else {
+			    echo "0 results";
+			}
+		}
+	}else if($_POST['action']=='post_data'){
 		# do not create extra postkey , use from previous post
 		// prohibit or watch again and read_count
 		$category = $_POST["tag"];

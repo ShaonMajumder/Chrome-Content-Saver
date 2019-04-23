@@ -128,7 +128,26 @@ function populate_categories(){
 
 document.addEventListener("click", function(e) {
   //page 1
-  if(e.target.id == "submit_to_category"){
+  if(e.target.id == "watch_later"){
+    chrome.tabs.query(
+      {currentWindow: true, active: true},
+      function(tabs){
+        var title = tabs[0].title;
+        var url = tabs[0].url;
+        var id = tabs[0].id;
+        var r = generate_valid_key();
+        $.post(postUrl, {"action":"watch_later","title":title,"url":url,"postkey":r},function(txt){
+          if(txt == r){
+            document.body.innerHTML = 'Watch it later.';
+            setTimeout(function(){ chrome.tabs.remove(id); }, 1000);
+          }else if(txt == "exists"){
+            document.body.innerHTML = 'Already Exists in watch later!!!';
+            setTimeout(function(){ chrome.tabs.remove(id); }, 1000);
+          }
+        });
+      }
+    );
+  }else if(e.target.id == "submit_to_category"){
     document.getElementById("initial").style="display:none;";
     document.getElementById("form1").style="display:block;";
     populate_categories();
