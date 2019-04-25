@@ -38,14 +38,17 @@ class MyQueries {
 		$result = $this->conn->query($sql);
 		return $result;
 	}
-	function edit($data,$update_key,$update_values,$condition) {
-		$stri = "";
-		foreach ($update_key as $keya => $vala) {
+	function edit($data,$update_keys,$update_values,$condition) {
+		$update_keys = $this->test_escape($this->conn,$update_keys);
+		$update_values = $this->test_escape($this->conn,$update_values);
+
+		$param_string = "";
+		foreach ($update_keys as $keya => $vala) {
 			$valb = $update_values[$keya];
-			$stri = $stri . "`{$vala}` = '{$valb}',";
+			$param_string = $param_string . "`{$vala}` = '{$valb}',";
 		}
-		$stri = rtrim($stri,",");
-		$sql = "UPDATE `{$data}` SET {$stri} WHERE {$condition}";
+		$param_string = rtrim($param_string,",");
+		$sql = "UPDATE `{$data}` SET {$param_string} WHERE {$condition}";
 		$result = $this->conn->query($sql);
 		return $result;
 	}
