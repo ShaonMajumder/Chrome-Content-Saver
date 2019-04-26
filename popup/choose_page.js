@@ -128,7 +128,17 @@ function populate_categories(){
 
 document.addEventListener("click", function(e) {
   //page 1
-  if(e.target.id == "watch_later"){
+  if(e.target.id == "open_links"){
+    document.getElementById("initial").style = "display: none;";
+    document.getElementById("open_link_form").style = "display: block;";
+  }else if(e.target.id == "submit_links"){
+    var links = document.getElementById("links").value
+    links = links.split('\n');
+    for(let link of links)
+      if(link != '')
+        chrome.tabs.create({url: link});
+    
+  }else if(e.target.id == "watch_later"){
     chrome.tabs.query(
       {currentWindow: true, active: true},
       function(tabs){

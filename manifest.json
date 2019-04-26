@@ -1,13 +1,20 @@
 {
 
   "manifest_version": 2,
-  "name": "Chrome Content Saver",
+  "name": "Content Master",
   "version": "1.0",
 
   "description": "Never Loose your content again",
 
   "icons": {
-    "48": "icons/32x32.png"
+    "16": "icons/Icon-16.png",
+    "24": "icons/Icon-29.png",
+    "32": "icons/Icon-32.png",
+    "48": "icons/Icon-48.png",
+    "64": "icons/Icon-64.png",
+    "128": "icons/Icon-128.png",
+    "256": "icons/Icon-256.png",
+    "512": "icons/Icon-512.png"
   },
 
   "permissions": [
@@ -23,8 +30,14 @@
     "browser_style": true,
     "default_popup": "popup/choose_page.html",
     "default_icon": {
-      "16": "icons/16x16.png",
-      "32": "icons/32x32.png"
+      "16": "icons/Icon-16.png",
+      "24": "icons/Icon-29.png",
+      "32": "icons/Icon-32.png",
+      "48": "icons/Icon-48.png",
+      "64": "icons/Icon-64.png",
+      "128": "icons/Icon-128.png",
+      "256": "icons/Icon-256.png",
+      "512": "icons/Icon-512.png"
     }
   }
 
