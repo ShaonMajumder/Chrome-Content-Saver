@@ -286,14 +286,25 @@ document.addEventListener("click", function(e) {
     var question = document.getElementById("question").value;
     var note = document.getElementById("note").value;
     
+    /*
+    var evt = new CustomEvent("myCustomEvent2",   {
+          detail: {
+              index: "<?php echo $index;?>",   
+          }
+          
+    });
+    document.dispatchEvent(evt);
+    */
 
     chrome.tabs.query(
       {currentWindow: true, active: true},
       function(tabs){
+        var index = tabs[0].index;
         var title = tabs[0].title;
         var url = tabs[0].url;
-        var newURL = postUrl+'?title='+title+'&cat='+category+'&sol='+solution+'&ques='+question+'&note='+note+'&url='+url;
-        chrome.tabs.create({ url: newURL });
+        var newURL = postUrl+'?id='+index+'&title='+title+'&cat='+category+'&sol='+solution+'&ques='+question+'&note='+note+'&url='+url;
+        chrome.tabs.create({ index : index + 1, url: newURL }, tab => {});
+        //function(tab){} or tab => {}
       }
     );
     

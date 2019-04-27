@@ -39,6 +39,22 @@
       "256": "icons/Icon-256.png",
       "512": "icons/Icon-512.png"
     }
-  }
+  },
+
+  "background": {
+    "scripts": ["content_background.js"],
+    "persistent": false
+  },
+
+  "externally_connectable": {
+    "matches": ["*://*.localhost.com/*"]
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content_saver.js"]
+    }
+  ]
 
 }

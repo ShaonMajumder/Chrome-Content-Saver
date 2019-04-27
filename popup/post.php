@@ -65,6 +65,7 @@ if($_GET){
 	$note = $_GET["note"];
 	$url = $_GET["url"];
 	$title = $_GET["title"];
+	$index = $_GET["id"];
 
 	$sql = "SELECT `value` FROM `constants` WHERE `name` = 'Resource_Categories'";
 	$result = $conn->query($sql);
@@ -120,6 +121,27 @@ if($_GET){
 		    	function(txt){
 		    		if(txt = postkey){
 						document.body.innerHTML = "Successfully Done !!! Close the tab.";
+						//call background script to close
+					//chrome.runtime.sendMessage('lklmkgjndficnaboeecdaeegpmkhgbdj',{shaon_message:'closetab'},function(r){/*alert(r.shaon_response);*/});
+					/*
+					var evt = document.createEvent('Event');
+					evt.initEvent('myCustomEvent', true, false);
+					evt.addindex
+
+					// fire the event
+					document.dispatchEvent(evt);*/
+
+
+					//Dispatch an event
+					var evt = new CustomEvent("myCustomEvent",   {
+				        detail: {
+				            index: "<?php echo $index;?>",   
+				        }
+				        
+				    });
+
+					document.dispatchEvent(evt);
+
 		    		}
 		    	}
 		    );

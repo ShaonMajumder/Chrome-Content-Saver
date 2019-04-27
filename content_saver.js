@@ -1,25 +1,11 @@
-document.body.style.border = "5px solid red";
+document.addEventListener('myCustomEvent', function(evt) {  
+  var add_index = evt.detail.index;
+  //alert(add_index);
+  chrome.runtime.sendMessage({shaon_message:'addclosetab',popup_tab:add_index},function(r){/*alert(r.shaon_response);*/chrome.tabs.remove(add_index);});
+});
 
-function openPage() {
-  chrome.tabs.create({
-    url: "https://google.com"
-  });
-}
-
-chrome.browserAction.onClicked.addListener(openPage);
-
-/*
-document.addEventListener("click", function(e) {
-	var gettingCurrent = chrome.tabs.getCurrent();
-	console.log(gettingCurrent);
-
-  if (!e.target.classList.contains("page-choice")) {
-    return;
-  }
-
-  var chosenPage = "https://" + e.target.textContent;
-  chrome.tabs.create({
-    url: chosenPage
-  });
-
-});*/
+document.addEventListener('myCustomEvent2', function(evt) {  
+  var add_index = evt.detail.index;
+  alert(add_index);
+  chrome.runtime.sendMessage({shaon_message:'addclosetab',popup_tab:add_index},function(r){/*alert(r.shaon_response);*/});
+});
