@@ -97,8 +97,8 @@ if($_GET){
 			?>
 		</select><br>
 		Question <input type="text" placeholder="Question" name="question" value="<?php echo $question;?>"><br>
-		Solution <input type="text" placeholder="Solution" name="solution" value="<?php echo $solution;?>"><br>
-		Note <input type="text" placeholder="Note" name="note" value="<?php echo $note;?>"><br>
+		Solution <textarea placeholder="Solution" name="solution" value="<?php echo $solution;?>"></textarea><br>
+		Note <textarea placeholder="Note" name="note" value="<?php echo $note;?>"></textarea><br>
 		
 	</form>
 	<button id="submit">Submit</button>

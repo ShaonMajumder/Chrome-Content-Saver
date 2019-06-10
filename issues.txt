@@ -1,0 +1,1 @@
+url breaks the data http://localhost/chrome_content_saver/popup/post.php?id=21&title=shell%20-%20How%20to%20print%20#!/bin/bash%20using%20echo%20command%20-%20Stack%20Overflow&cat=Health&sol=&ques=&note=&url=https://stackoverflow.com/questions/22797530/how-to-print-bin-bash-using-echo-command
